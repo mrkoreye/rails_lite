@@ -6,7 +6,7 @@ require 'active_support/core_ext'
 class ControllerBase
   attr_reader :params
 
-  def initialize(req, res, route_params = nil)
+  def initialize(req, res, route_params = {})
     @req = req
     @res = res
     @route_params = route_params
@@ -17,7 +17,7 @@ class ControllerBase
   end
   
   def params
-    @params ||= Params.new(@req)
+    @params ||= Params.new(@req, @route_params)
   end
 
   def already_rendered?

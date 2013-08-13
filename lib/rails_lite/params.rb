@@ -2,9 +2,10 @@ require 'uri'
 require 'active_support/core_ext'
 
 class Params
-  def initialize(req, route_params = nil)
-    return nil if req.query_string.nil? && req.body.nil?
+  def initialize(req, route_params = {})
+    #return nil if req.query_string.nil? && req.body.nil?
     @params = {}
+    @params.merge!(route_params)
     parse_www_encoded_form(req.query_string) unless req.query_string.nil?
     parse_www_encoded_form(req.body) unless req.body.nil?
   end

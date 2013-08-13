@@ -1,3 +1,5 @@
+require 'uri'
+
 class Route
   attr_reader :pattern, :http_method, :controller_class, :action_name
 
@@ -14,9 +16,10 @@ class Route
   end
 
   def run(req, res)
-    # hash = req.query_string.match(@pattern).hash
- #    p hash
-    controller_class.new(req, res).invoke_action(action_name)
+     match = pattern.match(req.path)
+     match_names_sym = match.names.map { |name| name.to_sym }
+     hash = Hash[ match_names_sym.zip(match.captures) ]
+    controller_class.new(req, res, hash).invoke_action(action_name)
   end
 end
 
