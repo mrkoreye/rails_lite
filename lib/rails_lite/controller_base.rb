@@ -1,6 +1,7 @@
 require 'erb'
 require_relative 'params'
 require_relative 'session'
+require_relative 'flash'
 require 'active_support/core_ext'
 
 class ControllerBase
@@ -14,6 +15,10 @@ class ControllerBase
 
   def session
     @session ||= Session.new(@req)
+  end
+  
+  def flash
+    @flash ||= Flash.new(@req)
   end
   
   def params
@@ -30,6 +35,7 @@ class ControllerBase
     @already_rendered = true
     
     @session.store_session(@res)
+    self.flash.store_flash(@res)
     @res
   end
 
@@ -38,6 +44,7 @@ class ControllerBase
     @res.content_type = content_type
     @already_rendered = true
     self.session.store_session(@res)
+    self.flash.store_flash(@res)
     @res
   end
 
@@ -48,10 +55,18 @@ class ControllerBase
       )
     b = binding
     render_content(erb_template.result(b), 'text/html')
+    delete
   end
 
   def invoke_action(action_name)
     self.send(action_name)
     render(action_name) unless already_rendered?
   end
+  
+  def form_authenticity_token
+    token = SecureRandom::urlsafe_base64(16)
+    self.session["authenticity_token"] = token
+    token
+  end
+  
 end

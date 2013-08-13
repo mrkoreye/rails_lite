@@ -18,7 +18,14 @@ class StatusController < ControllerBase
   end
 
   def show
-    render_content("status ##{params[:id]}", "text/text")
+    if params[:id] == "4"
+      flash[:error] = "You made a flash!"
+      render_content("status ##{params[:id]}, #{flash[:error]}", "text/text")
+    else
+      render_content("status ##{params[:id]}, #{flash[:error]},
+          #{form_authenticity_token}, #{session['authenticity_token']}", 
+          "text/text")
+    end
   end
 end
 
